@@ -16,9 +16,7 @@ def search_inn(inn):
     result = dadata.find_by_id("party", inn)
     if result:
         st.session_state["result"] = result
-        #st.write(st.session_state["result"])
-        st.session_state["page"] = "INN"
-        #st.write(st.session_state["page"])
+        st.session_state["page"] = "Информация по ИНН"
         st.rerun()
     else:
         st.warning("Организация с таким ИНН не найдена.")
@@ -36,7 +34,11 @@ if st.session_state.page == "Главная":
         if submit_button and inn:
             search_inn(inn)
 
-elif st.session_state.page == "INN":
+elif st.session_state.page == "Информация по ИНН":
     st.button('Вернуться назад', on_click=come_back)
-    if st.session_state.result:
-        st.json(st.session_state.result)
+    df = pd.json_normalize(st.session_state.result)
+    df = df.dropna(axis=1, how='all')
+    st.write("Компания - " + st.session_state.result[0]['value'])
+
+    st.write(df)
+    st.json(st.session_state.result)
