@@ -1,9 +1,11 @@
 import streamlit as st
 import pandas as pd
 from dadata import Dadata
-
+import json
 token = "d985c7e3b12214e90bd757d6f1a33ff7fae4dab0"
 secret = "f987c2ae035d44b1967754c9b176ea759d855480"
+with open('translate_data.json', 'r', encoding='utf-8') as json_file:
+    data_translate = json.load(json_file)
 dadata = Dadata(token, secret)
 
 if "page" not in st.session_state:
@@ -21,7 +23,6 @@ def search_inn(inn):
     else:
         st.warning("Организация с таким ИНН не найдена.")
 
-
 def come_back():
     st.session_state.page = "Главная"
     st.session_state.result = None
@@ -37,8 +38,8 @@ if st.session_state.page == "Главная":
 elif st.session_state.page == "Информация по ИНН":
     st.button('Вернуться назад', on_click=come_back)
     df = pd.json_normalize(st.session_state.result)
-    df = df.dropna(axis=1, how='all')
+    df = df.reindex(columns=data_translate.keys())
+    df=df.rename(columns=data_translate)
     st.write("Компания - " + st.session_state.result[0]['value'])
-
     st.write(df)
     st.json(st.session_state.result)
