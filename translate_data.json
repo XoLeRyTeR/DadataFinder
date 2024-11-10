@@ -142,7 +142,6 @@
     "data.address.data.geo_lon": "географическая_долгота",
     "data.address.data.beltway_hit": "расположение_на_МКАД",
     "data.address.data.beltway_distance": "расстояние_до_МКАД",
-    "data.address.data.metro": "метро",
     "data.address.data.divisions": "подразделения",
     "data.address.data.qc_geo": "качество_геоданных",
     "data.address.data.qc_complete": "полнота_данных",
