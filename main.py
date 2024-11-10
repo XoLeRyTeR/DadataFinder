@@ -47,7 +47,8 @@ def sql_query(df):
 
     if (existing_record):
         for i in df.columns:
-            cursor.execute(f"UPDATE users SET '{i}' = '{df.at[0, i]}' WHERE ИНН = {inn}")
+            if (df.at[0, i]):
+                cursor.execute(f"UPDATE users SET '{i}' = '{df.at[0, i]}' WHERE ИНН = {inn}")
         conn.commit()
     else:
         df.to_sql('users', conn, if_exists='append', index=False)
@@ -67,11 +68,10 @@ def come_find():
     st.session_state.page = 'Поиск по ИНН'
 
 if st.session_state.page=="Главная":
-    st.title("База данных компний")
-    st.button('Поиск по ИНН',on_click=come_find)
-
+    st.title("База данных компаний")
     all_users = pd.read_sql("SELECT * FROM users", conn)
     st.dataframe(all_users, width=10000)
+    st.button('Поиск по ИНН', on_click=come_find)
 
 elif st.session_state.page == "Поиск по ИНН":
     st.title('Введите ИНН')
