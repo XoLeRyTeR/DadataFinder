@@ -1,4 +1,5 @@
 {
+    "data.inn": "ИНН",
     "value": "значение",
     "unrestricted_value": "неограниченное_значение",
     "data.kpp": "КПП",
@@ -31,7 +32,6 @@
     "data.name.latin": "наименование_латиницей",
     "data.name.full": "полное_наименование",
     "data.name.short": "краткое_наименование",
-    "data.inn": "ИНН",
     "data.ogrn": "ОГРН",
     "data.okpo": "ОКПО",
     "data.okato": "ОКАТO",
