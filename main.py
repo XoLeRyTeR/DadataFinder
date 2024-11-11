@@ -65,16 +65,23 @@ def come_back():
     st.session_state.page = "Главная"
     st.session_state.result = None
 def come_find():
-    st.session_state.page = 'Поиск по ИНН'
+    st.session_state.page = 'Главная'
 
-if st.session_state.page=="Главная":
+def come_BD():
+    st.session_state.page = 'База данных'
+
+if st.session_state.page=="База данных":
     st.title("База данных компаний")
     all_users = pd.read_sql("SELECT * FROM users", conn)
     st.dataframe(all_users, width=10000)
     st.button('Поиск по ИНН', on_click=come_find)
 
-elif st.session_state.page == "Поиск по ИНН":
-    st.title('Введите ИНН')
+elif st.session_state.page == "Главная":
+    col1,col2 = st.columns([4,1])
+    with(col1):
+        st.subheader('Введите ИНН')
+    with col2:
+        st.button('Все компании',on_click=come_BD)
     with st.form(key="inn_form"):
         inn = st.text_input("Введите ИНН")
         submit_button = st.form_submit_button("Найти")
