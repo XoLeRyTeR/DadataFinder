@@ -1,10 +1,9 @@
-FROM python:slim
+FROM python:3.10-slim
 WORKDIR /app
 
 
 COPY *.py *.json requirements.txt /app
-
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["streamlit", "run", "main.py"]
 EXPOSE 8501
+CMD ["streamlit", "run", "main.py"]
