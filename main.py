@@ -8,7 +8,7 @@ import json
 token = "d985c7e3b12214e90bd757d6f1a33ff7fae4dab0"
 secret = "f987c2ae035d44b1967754c9b176ea759d855480"
 
-conn = sqlite3.connect('my_database.db')
+conn = sqlite3.connect('data.db')
 cursor =conn.cursor()
 
 with open('translate_data.json', 'r', encoding='utf-8') as json_file:
@@ -73,15 +73,24 @@ def come_BD():
     st.session_state.page = 'База данных'
 
 def come_tabl():
-    st.session_state.page= 'питоняшка'
+    st.session_state.page= 'Таблица с заполнением'
 
 if st.session_state.page=="База данных":
+    st.set_page_config(layout="wide")
     st.title("База данных компаний")
-    all_users = pd.read_sql("SELECT * FROM users", conn)
-    st.dataframe(all_users, width=1000000000)
-    st.button('Поиск по ИНН', on_click=come_find)
+    try:
+        all_users = pd.read_sql("SELECT * FROM users", conn)
+        st.dataframe(all_users, width=1000000000)
+        st.button('Поиск по ИНН', on_click=come_find)
+    except:
+        df = pd.DataFrame(columns=data_translate.values())
+        df.to_sql('users', conn, if_exists='append', index=False)
+        all_users = pd.read_sql("SELECT * FROM users", conn)
+        st.dataframe(all_users, width=1000000000)
+        st.button('Поиск по ИНН', on_click=come_find)
 
 elif st.session_state.page == "Главная":
+    st.set_page_config(layout="centered")
     col1,col2,col3 = st.columns([4,1.2,1])
     with(col1):
         st.subheader('Введите ИНН')
@@ -102,7 +111,8 @@ elif st.session_state.page == "Информация по ИНН":
     df = prepross().head(1)
     st.write(df)
     sql_query(df)
-elif st.session_state.page == "питоняшка":
+elif st.session_state.page == "Таблица с заполнением":
+    st.set_page_config(layout="wide")
     st.button('Вернуться',on_click=come_back)
     table = pd.read_sql("SELECT * FROM 'table'", conn)
     st.dataframe(table)
