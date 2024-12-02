@@ -27,7 +27,7 @@ jobs:
 
       - name: Start Streamlit
         run: |
-          streamlit run app.py &
+          streamlit run main.py &
           sleep 10
 
       - name: Verify Streamlit is running
