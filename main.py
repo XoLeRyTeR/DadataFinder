@@ -17,7 +17,7 @@ with open('translate_data.json', 'r', encoding='utf-8') as json_file:
 dadata = Dadata(token, secret)
 
 if "page" not in st.session_state:
-    st.session_state.page = "Авторизация"
+    st.session_state.page = "Главная"
 if "result" not in st.session_state:
     st.session_state.result = None
 if "button_clicked" not in st.session_state:
@@ -170,25 +170,6 @@ elif st.session_state.page == "Таблица с заполнением":
             st.success("Строка добавлена!")
             st.session_state.button_clicked = False
             st.rerun()
-elif st.session_state.page == 'Авторизация':
-    col1,col2,col3 = st.columns([1,1,1])
-    with col2:
-        st.subheader('Авторизация')
-        login = st.text_input('Логин')
-        password = st.text_input('Пароль')
-        if st.button('Войти'):
-            cursor.execute("SELECT password FROM accounts WHERE user = ?", (login,))
-            result = cursor.fetchone()
-            if (result):
-                if (result[0] == password):
-                    st.session_state.button_clicked = False
-                    st.session_state.page = "Главная"
-                    st.session_state.result = None
-                    st.rerun()
-                else:
-                    st.warning('Неверный пароль')
-            else:
-                st.warning('Логин не найден')
 
 
 
