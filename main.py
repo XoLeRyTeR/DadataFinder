@@ -96,7 +96,6 @@ if st.session_state.page=="База данных":
 
 elif st.session_state.page == "Главная":
     st.set_page_config(layout="centered")
-    a=23/0
     col1,col2,col3 = st.columns([4,1.2,1])
     with(col1):
         st.subheader('Введите ИНН')
@@ -113,7 +112,6 @@ elif st.session_state.page == "Главная":
 elif st.session_state.page == "Информация по ИНН":
     st.button('Вернуться назад', on_click=come_back)
     st.write("Компания - " + st.session_state.result[0]['value'])
-
     df = prepross().head(1)
     st.write(df)
     sql_query(df)
