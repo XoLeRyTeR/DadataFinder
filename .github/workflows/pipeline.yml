@@ -36,7 +36,7 @@ jobs:
   build_and_push_docker:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: test
+    needs: test-streamlit
 
     steps:
       - name: Checkout code
