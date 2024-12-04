@@ -116,6 +116,7 @@ elif st.session_state.page == "Информация по ИНН":
     df = prepross().head(1)
     st.write(df)
     sql_query(df)
+
 elif st.session_state.page == "Таблица с заполнением":
     st.set_page_config(layout="wide")
     st.button('Вернуться',on_click=come_back)
