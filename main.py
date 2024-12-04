@@ -98,7 +98,7 @@ elif st.session_state.page == "Главная":
     st.set_page_config(layout="centered")
     col1,col2,col3 = st.columns([4,1.2,1])
     with(col1):
-        st.subheader('едите ИНН')
+        st.subheader('едите ИНН?')
     with col2:
         st.button('Все компании',on_click=come_BD)
     with col3:
