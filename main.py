@@ -105,7 +105,7 @@ elif st.session_state.page == "Главная":
     with col3:
         st.button('Таблица',on_click=come_tabl)
     with st.form(key="inn_form"):
-        inn = st.text_input("фича")
+        inn = st.text_input("Введите ИНН")
         submit_button = st.form_submit_button("Найти")
         if submit_button and inn:
             search_inn(inn)
