@@ -110,6 +110,7 @@ elif st.session_state.page == "Главная":
         if submit_button and inn:
             search_inn(inn)
 
+
 elif st.session_state.page == "Информация по ИНН":
     st.button('Вернуться назад', on_click=come_back)
     st.write("Компания - " + st.session_state.result[0]['value'])
