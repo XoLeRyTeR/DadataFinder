@@ -96,6 +96,7 @@ if st.session_state.page=="База данных":
 
 elif st.session_state.page == "Главная":
     st.set_page_config(layout="centered")
+
     col1,col2,col3 = st.columns([4,1.2,1])
     with(col1):
         st.subheader('едите ИНН?')
