@@ -34,7 +34,6 @@ jobs:
   build_and_push:
     name: Push Docker image
     runs-on: ubuntu-latest
-    needs: test-streamlit
     permissions:
       contents: read
 
@@ -50,7 +49,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          images: xoleryter/app:latest
+          images: xoleryter/app
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
