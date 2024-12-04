@@ -1,5 +1,4 @@
 name: Streamlit Check
-
 on:
   push:
     branches:
@@ -47,7 +46,6 @@ jobs:
       - name: Log in to the Docker registry
         uses: docker/login-action@v2
         with:
-
           username: ${{ secrets.MY_DOCKER }}
           password: ${{ secrets.MY_DOCKER_PASSWORD }}
       - name: Build and push Docker image
