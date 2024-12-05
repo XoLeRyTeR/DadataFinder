@@ -6,29 +6,23 @@ on:
   pull_request:
     branches:
       - master
+env:
+  SERVER_HOST: 194.87.161.47
+  SERVER_USER: xoleryter
+  SERVER_PATH: /dadatafiner
 jobs:
   deploy:
     runs-on: ubuntu-latest
     #needs: build_and_push
     steps:
       - name: login ssh
-        uses: webfactory/ssh-agent@v0.5.0
+        uses: shimataro/ssh-key-action@v2.3.1
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: 194.87.161.47
-          username: xoleryter
-          key: ${{ secrets.SSH_PRIVATE_KEY}}
-          script: |
-            docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down;docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up
-      - name: Install SSH Client
-        run: sudo apt-get update && sudo apt-get install -y ssh
+          key: "${{ secrets.SSH_PRIVATE_KEY }}"
+      - name: stop
+        run: docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
+      - name: up
+        run: docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up
 
-      - name: Connect and deploy on the server
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh -T xoleryter@194.87.161.47
-          docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
-          docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up
+
 
