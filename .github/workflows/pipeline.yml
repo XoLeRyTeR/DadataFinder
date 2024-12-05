@@ -20,10 +20,12 @@ jobs:
         with:
           key: "${{ secrets.SSH_PRIVATE_KEY }}"
           known_hosts: "just-a-placeholder-so-we-dont-get-errors"
-      - name: stop
-        run: docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
-      - name: up
-        run: docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up
+      - name: Connect and deploy on the server
+        run: |
+          ssh -T xoleryter@194.87.161.47 << 'EOF'
+            docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
+            docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up -d
+          EOF
 
 
 
