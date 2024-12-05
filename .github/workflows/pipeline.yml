@@ -69,7 +69,7 @@ jobs:
       - name: Connect and deploy on the server
         run: |
           
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh xoleryter@194.87.161.47
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | ssh -T xoleryter@194.87.161.47
           docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
           docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up
 
