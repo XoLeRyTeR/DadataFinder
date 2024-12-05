@@ -58,6 +58,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   deploy:
+    needs: build_and_push
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
