@@ -6,25 +6,26 @@ on:
   pull_request:
     branches:
       - master
-env:
-  SERVER_HOST: 194.87.161.47
-  SERVER_USER: xoleryter
-  SERVER_PATH: /dadatafiner
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    #needs: build_and_push
     steps:
-      - name: login ssh
-        uses: shimataro/ssh-key-action@v2.3.1
-        with:
-          key: "${{ secrets.SSH_PRIVATE_KEY }}"
-          known_hosts: "just-a-placeholder-so-we-dont-get-errors"
-      - name: Connect and deploy on the server
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
         run: |
-          ssh -T xoleryter@194.87.161.47 << 'EOF'
-            docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
-            docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up -d
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 194.87.161.47 >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        run: |
+          ssh xoleryter@194.87.161.47 << 'EOF'
+          docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml down
+          docker compose -f /home/xoleryter/dadatafiner/compose.template.yaml up
           EOF
 
 
