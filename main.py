@@ -175,7 +175,7 @@ elif st.session_state.page == "Таблица с заполнением":
 elif st.session_state.page == 'Авторизация':
     col1,col2,col3 = st.columns([1,1,1])
     with col2:
-        st.subheader('Авторизацияяяяя')
+        st.subheader('Авторизация')
         login = st.text_input('Логин')
         password = st.text_input('Пароль')
         if st.button('Войти'):
