@@ -18,6 +18,7 @@ dadata = Dadata(token, secret)
 
 if "page" not in st.session_state:
     st.session_state.page = "Авторизация"
+
 if "result" not in st.session_state:
     st.session_state.result = None
 if "button_clicked" not in st.session_state:
