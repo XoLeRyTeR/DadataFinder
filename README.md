@@ -1,4 +1,4 @@
-# CVCODE-VK-Friends
+# Debitorka
 
 ## Introduction
 
