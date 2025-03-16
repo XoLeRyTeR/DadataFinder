@@ -1,0 +1,261 @@
+from pprint import pprint
+import re
+
+import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait, Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.service import Service
+from lxml import etree
+from bs4 import BeautifulSoup
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
+import time
+import os
+from urllib.parse import urljoin
+
+# Настройки
+
+DRIVER_PATH = '/opt/homebrew/bin/chromedriver'
+BASE_URL = 'https://old.bankrot.fedresurs.ru/'
+START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
+
+class Parser:
+    def __init__(self):
+        options = webdriver.ChromeOptions()
+        # options.add_argument('--headless=new')
+        # options.add_argument('--disable-gpu')
+        # options.add_argument('--no-sandbox')
+        options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+
+        self.driver = webdriver.Chrome(
+            service=Service(executable_path='/opt/homebrew/bin/chromedriver'),
+            options=options
+        )
+        self.wait = WebDriverWait(self.driver, 20)
+    def select_classification(self):
+        options_categories=[
+            "Права требования на краткосрочные долговые обязательства (дебиторская задолженность)",
+            "Ценные бумаги",
+            "Уступка требований по  кредитным обязательствам"
+        ]
+        element_text_categories = self.wait.until(
+            EC.presence_of_element_located((By.ID, "ctl00_cphBody_ucPropertyCategoriesSelect_tbSelectedText"))
+        )
+        element_text_categories.click()
+        self.wait.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, "//tr[@class='rwContentRow']//iframe")))
+        self.wait.until(EC.presence_of_element_located((By.ID, "ctl00_BodyPlaceHolder_divContainer")))
+        for option in options_categories:
+            text_element = self.wait.until(
+                EC.presence_of_element_located((By.XPATH, f"//span[@class='rtIn' and contains(text(), '{option}')]"))
+            )
+            parent_element = text_element.find_element(By.XPATH, "./..")
+            time.sleep(1)
+            rt_checked_element = parent_element.find_element(By.CLASS_NAME, "rtUnchecked")
+            time.sleep(1)
+            rt_checked_element.click()
+
+        self.wait.until(
+            EC.presence_of_element_located((By.ID, f"ctl00_BodyPlaceHolder_btnSelect"))
+        ).click()
+        self.driver.switch_to.default_content()
+    def click_search_filters(self):
+        return self.wait.until(
+            EC.presence_of_element_located((By.ID, f"ctl00_cphBody_btnTradeSearch"))
+        ).click()
+    def collect_link_auctions_page(self):
+        rows = self.driver.find_elements(By.XPATH, "//table[@id='ctl00_cphBody_gvTradeList']//tr")
+        trade_link = []
+        for row in rows:
+            trade_type_cell = row.find_elements(By.XPATH, ".//td[6]")
+            if trade_type_cell:
+                try:
+                    trade_a = trade_type_cell[0].find_element(By.XPATH, ".//a")
+                except:
+                    print("тут ошибочка")
+                    continue
+                href = trade_a.get_attribute('href')
+                if "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID" in href:
+                    trade_link.append(href)
+        return trade_link
+    def __get_count_all_auctions(self,text)->int:
+        match = re.search(r"Всего:\s*(\d+)", text)
+        if match:
+            total = int(match.group(1))
+            return total
+    def collect_all_link_on_auctions(self):
+        all_link=[]
+        all_link.extend(self.collect_link_auctions_page())
+        count_all_auctions = self.__get_count_all_auctions(self.driver.find_element(By.ID, "ctl00_cphBody_PaggingAdvInfo1_tdPaggingAdvInfo").text.strip())
+        for page in range(2,count_all_auctions+1):
+            pprint(f"page : {page}")
+            td=self.driver.find_element(By.XPATH,"//*[@id='ctl00_cphBody_gvTradeList']/tbody/tr[22]/td/table/tbody/tr")
+            all_tr=td.find_elements(By.TAG_NAME,"a")
+            last_page_current_slideboard=all_tr[-1].text
+            for i,a in enumerate(all_tr):
+                if a.text=="..." and i==0:
+                    continue
+                if a.text=="..."  or (str(page)==a.text and a.text.isdecimal()):
+                    if page==42:
+                        print("stop")
+                    time.sleep(1)
+                    a.click()
+                    time.sleep(2)
+                    all_link.extend(self.collect_link_auctions_page())
+                    break
+            if last_page_current_slideboard==str(page):
+                print("last page")
+                break
+        return list(set(all_link))
+
+    def __get_link_from_td(self,td_dom):
+        try:
+            return str(td_dom.find_element(By.TAG_NAME,"a").get_attribute("href"))
+        except NoSuchElementException:
+            return ""
+    def __get_number_lot(self,text):
+        # Регулярное выражение для извлечения ключа и значения
+        pattern = r"(?P<key>\D+)\s*№\s*(?P<value>\d+)"
+
+        # Поиск совпадений
+        match = re.search(pattern, text)
+
+        # Создание словаря
+        if match:
+            return {"key": match.group("key").strip(), "value": match.group("value")}
+        else:
+            return {"key": "Лот", "value": text}
+    def get_deatail_info(self,tag_detail):
+        original_tab = self.driver.current_window_handle
+        # Находим кнопку, которая открывает новую страницу
+        tag_detail.click()
+
+        # Переключаемся на новую вкладку
+        new_tab = self.driver.window_handles[-1]  # Последняя вкладка
+        self.driver.switch_to.window(new_tab)
+
+        # Получаем информацию (например, заголовок страницы)
+        text_details=self.wait.until(
+            EC.presence_of_element_located((By.XPATH, f"/html/body/table/tbody/tr[2]/td"))
+        ).text
+        # Закрываем новую вкладку
+        self.driver.close()
+        # Возвращаемся на исходную вкладку
+        self.driver.switch_to.window(original_tab)
+        return text_details
+    def collect_lots(self):
+        info=[]
+        name_lots=self.wait.until(
+            EC.presence_of_element_located((By.XPATH, f"//*[@id='ctl00_cphBody_rpvLots']"))
+        ).find_element(By.TAG_NAME,"div").find_element(By.TAG_NAME,"div").text
+        info.append(self.__get_number_lot(name_lots))
+        table_tr=self.wait.until(
+            EC.presence_of_all_elements_located((By.XPATH, f"//*[@id='ctl00_cphBody_lvLotList_ctrl0_tblTradeLot']/tbody/tr"))
+        )
+
+        for tr in table_tr:
+            tds=tr.find_elements(By.TAG_NAME,"td")
+            if len(tds)==2:
+                info.append({
+                    "key":tds[0].text,
+                    "value":tds[1].text
+                })
+
+            else:
+                div_value=tds[0].find_element(By.TAG_NAME,"div")
+                try:
+                    detail=div_value.find_element(By.TAG_NAME,"a")
+                    detail_info=self.get_deatail_info(detail)
+                except NoSuchElementException:
+                    detail_info=div_value.text
+                info.append({
+                    "key":tds[0].find_element(By.TAG_NAME,"b").text,
+                    "value":detail_info.strip()
+                })
+        return info
+    def collect_messages(self):
+        pass
+    def collect_docs(self):
+        pass
+    def collect_additionally(self):
+        pass
+    def all_data_about_auction_in_headlines(self,headlines):
+        result_data=dict()
+        type_callback={
+            'Лоты':self.collect_lots,
+            'Сообщения':self.collect_messages,
+            'Документы':self.collect_docs,
+            'Дополнительно':self.collect_additionally,
+        }
+        for head in headlines:
+            element_headlines = self.wait.until(
+                EC.presence_of_element_located((By.XPATH, f"//*[@id='ctl00_cphBody_rtsTrade']/div/ul/li[contains(., '{head}')]"))
+            )
+            element_headlines.click()
+            result_data[head]=type_callback[head]()
+        return result_data
+
+    def get_headlines_auction(self):
+        elements_headlines = self.wait.until(
+            EC.presence_of_all_elements_located((By.XPATH, "//*[@id='ctl00_cphBody_rtsTrade']/div/ul/li"))
+        )
+        headlines_text=[li.text for li in elements_headlines]
+        return headlines_text
+    def get_info_from_table_auction(self):
+        data=[]
+        elements_info = self.wait.until(
+            EC.presence_of_all_elements_located((By.XPATH, "//table[@id='ctl00_cphBody_tableTradeInfo']//tr"))
+        )
+        for row in elements_info:
+            tds=row.find_elements(By.TAG_NAME,"td")
+            data.append({
+                "key":tds[0].text,
+                "value":tds[1].text,
+                "href":self.__get_link_from_td(tds[0])
+                         })
+        return data
+
+
+
+    def run(self):
+        # self.driver.get(START_URL)
+        # self.select_classification()
+        # time.sleep(1)
+        # self.click_search_filters()
+        # time.sleep(10)
+        # self.collect_link_auctions_page()
+        # all_link_auctions=self.collect_all_link_on_auctions()
+        # pprint(all_link_auctions)
+        all_link_auctions=[
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=3f7b8e4d-f11d-4ad5-8b64-2ae78dbb4e4e',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=d6784d75-18c7-4691-8b08-2cb503fe27af',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=0e53cd74-310b-4485-be97-2c9b80437010',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11c337b5-228e-41bb-b710-37f5e46ca9d0',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=4c9cad0e-9df4-45c0-a0da-61e17c845cba',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=45c2f186-c4f8-4010-86d6-9ad39472ec49',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=95dcc376-c862-4215-a24e-3844d5c78233',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=905df1eb-ae54-4962-82ed-32d76fc8f6da',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=a73875b1-8ff6-4dc7-99c1-b7e34fd76006',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=ccb6d1ef-9293-4973-9c57-84c07418b58d',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11eb4933-035e-4bfa-9a46-5fef8b273a2a',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=27a47ab4-269c-4f21-a0fd-0357353bcff6',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f29937fc-734b-423f-ab87-013c88bdcc39',
+            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f6156a07-af21-4088-a1de-923ab32ed79a',
+        ]
+        for link_auiction in all_link_auctions:
+            self.driver.get(link_auiction)
+            # result_table=self.get_info_from_table_auction()
+            headlines_auction=self.get_headlines_auction()
+            result_headlines=self.all_data_about_auction_in_headlines(headlines_auction)
+
+
+
+
+def main():
+    p=Parser()
+    p.run()
+
+if __name__ == '__main__':
+    main()
