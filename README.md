@@ -15,4 +15,3 @@ The project was created to collect information about auctions
   PATH_DB=<path to database>
   ```
 ## Usage
-- 
