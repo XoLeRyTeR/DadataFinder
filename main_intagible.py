@@ -55,6 +55,18 @@ class Parser:
             )
 
         self.wait = WebDriverWait(self.driver, 20)
+    def __get_number_lot(self,text):
+        # Регулярное выражение для извлечения ключа и значения
+        pattern = r"(?P<key>\D+)\s*№\s*(?P<value>\d+)"
+
+        # Поиск совпадений
+        match = re.search(pattern, text)
+
+        # Создание словаря
+        if match:
+            return {"key": match.group("key").strip(), "value": match.group("value")}
+        else:
+            return {"key": "Лот", "value": text}
     def select_classification(self):
         options_categories=[
             "Права требования на краткосрочные долговые обязательства (дебиторская задолженность)",
