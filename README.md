@@ -15,3 +15,8 @@ The project was created to collect information about auctions
   PATH_DB=<path to database>
   ```
 ## Usage 
+- Need download browser driver and move in project folder
+- Specify the PATH_DIR_TEMP variable in the main file, pointing to the temporary folder.
+```
+  PATH_DIR_TEMP="<your path>/DadataFinder/data/temp"
+  ```
