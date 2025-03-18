@@ -223,6 +223,8 @@ class Parser:
         pass
     def all_data_about_auction_in_headlines(self,headlines):
         result_data=dict()
+    def get_all_data_about_auction_in_headlines(self, headlines):
+        result_data=[]
         type_callback={
             'Лоты':self.collect_lots,
             'Сообщения':self.collect_messages,
@@ -234,7 +236,7 @@ class Parser:
                 EC.presence_of_element_located((By.XPATH, f"//*[@id='ctl00_cphBody_rtsTrade']/div/ul/li[contains(., '{head}')]"))
             )
             element_headlines.click()
-            result_data[head]=type_callback[head]()
+            result_data.append({"key":head,"value":type_callback[head]()})
         return result_data
 
 
