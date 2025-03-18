@@ -33,7 +33,7 @@ START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
 PATH_DIR_TEMP="C:\\Users\\kuzic\\PycharmProjects\\DadataFinder\\data\\temp"
 class Parser:
     def __init__(self,name_browser:str,path_driver:str):
-
+        self.options_categories = []
         if name_browser=='Chrome':
             options = webdriver.ChromeOptions()
             # options.add_argument('--headless=new')
