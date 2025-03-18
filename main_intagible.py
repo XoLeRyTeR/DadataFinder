@@ -103,6 +103,12 @@ class Parser:
             return {"key": match.group("key").strip(), "value": match.group("value")}
         else:
             return {"key": "Лот", "value": text}
+    def generate_unique_string(self,length=10):
+        # Используем буквы и цифры для создания строки
+        characters = string.ascii_letters
+        # Генерируем строку случайных символов
+        unique_string = ''.join(random.choice(characters) for _ in range(length))
+        return unique_string
     def select_classification(self):
         options_categories=[
             "Права требования на краткосрочные долговые обязательства (дебиторская задолженность)",
