@@ -355,6 +355,17 @@ class Parser:
                         # Добавляем строку таблицы в результат с разделителем \t
                         result += "\t".join(row_data) + "\n"
         return result
+    def unzip_acrhive_documents(self,name_docs,extract_dir)->list:
+        current_files=[]
+        with zipfile.ZipFile(os.path.join("data/temp/", name_docs), 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
+            # Получаем список всех файлов в архиве
+            file_list = zip_ref.namelist()
+            # Формируем полные пути к извлеченным файлам
+            extracted_files = [os.path.join(extract_dir, file) for file in file_list]
+            current_files.extend([file for file in extracted_files if
+                                  os.path.isfile(file) and (file.endswith(".doc") or file.endswith(".docx"))])
+        return current_files
     def get_text_document_pdf(self,path_document)->str:
         reader = pypdf.PdfReader(path_document)
         return "\n".join([page.extract_text() for page in reader.pages])
