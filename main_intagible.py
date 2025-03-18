@@ -67,6 +67,9 @@ class Parser:
             )
 
         self.wait = WebDriverWait(self.driver, 20)
+    def init_options_categories(self,categories:list):
+        self.options_categories = categories
+
     def __get_link_in_a_onclick(self,onclick_text):
         pattern = r"openNewWin\('([^']+)'"
 
