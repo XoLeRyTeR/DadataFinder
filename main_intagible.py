@@ -229,32 +229,31 @@ class Parser:
         # all_link_auctions=self.collect_all_link_on_auctions()
         # pprint(all_link_auctions)
         all_link_auctions=[
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=3f7b8e4d-f11d-4ad5-8b64-2ae78dbb4e4e',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=d6784d75-18c7-4691-8b08-2cb503fe27af',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=0e53cd74-310b-4485-be97-2c9b80437010',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11c337b5-228e-41bb-b710-37f5e46ca9d0',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=4c9cad0e-9df4-45c0-a0da-61e17c845cba',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=45c2f186-c4f8-4010-86d6-9ad39472ec49',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=95dcc376-c862-4215-a24e-3844d5c78233',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=905df1eb-ae54-4962-82ed-32d76fc8f6da',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=a73875b1-8ff6-4dc7-99c1-b7e34fd76006',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=ccb6d1ef-9293-4973-9c57-84c07418b58d',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11eb4933-035e-4bfa-9a46-5fef8b273a2a',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=27a47ab4-269c-4f21-a0fd-0357353bcff6',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f29937fc-734b-423f-ab87-013c88bdcc39',
-            'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f6156a07-af21-4088-a1de-923ab32ed79a',
+            "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=905df1eb-ae54-4962-82ed-32d76fc8f6da"
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=8bf4e8fd-4088-4bbe-a0a4-af6f4b1f46d6',
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=a73875b1-8ff6-4dc7-99c1-b7e34fd76006',
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=ccb6d1ef-9293-4973-9c57-84c07418b58d',
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11eb4933-035e-4bfa-9a46-5fef8b273a2a',
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=27a47ab4-269c-4f21-a0fd-0357353bcff6',
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f29937fc-734b-423f-ab87-013c88bdcc39',
+            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f6156a07-af21-4088-a1de-923ab32ed79a',
         ]
-        for link_auiction in all_link_auctions:
-            self.driver.get(link_auiction)
-            # result_table=self.get_info_from_table_auction()
+        data={}
+        for link_auction in all_link_auctions:
+            result_link=[]
+            self.driver.get(link_auction)
+            time.sleep(1)
+            result_link.extend(self.get_info_from_gen_table_auction())
             headlines_auction=self.get_headlines_auction()
-            result_headlines=self.all_data_about_auction_in_headlines(headlines_auction)
+            result_link.extend(self.get_all_data_about_auction_in_headlines(headlines_auction))
+            data[link_auction]=result_link
 
-
+        with open("dict_to_json_textfile_2.json", "w", encoding="utf-8") as fout:
+            json.dump(data, fout, ensure_ascii=False, indent=4)
 
 
 def main():
-    p=Parser()
+    p=Parser("Chrome",DRIVER_PATH)
     p.run()
 
 if __name__ == '__main__':
