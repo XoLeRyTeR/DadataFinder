@@ -219,7 +219,28 @@ class Parser:
             })
         return info
     def collect_messages(self):
-        pass
+        result_data=[]
+        table_tr = self.wait.until(
+            EC.presence_of_element_located(
+                (By.XPATH, f"//*[@id ='ctl00_cphBody_gvMessages']"))
+        )
+        headlines=[header.text for header in table_tr.find_elements(By.TAG_NAME, 'th')]
+        rows = table_tr.find_elements(By.TAG_NAME, 'tr')[1:]  # Пропускаем первую строку с заголовками
+
+        # Проходим по строкам таблицы
+        for row in rows:
+            # Извлекаем ячейки в строке
+            cells = row.find_elements(By.TAG_NAME, 'td')
+            detail = cells[2].find_element(By.TAG_NAME, "a")
+            detail_info = self.get_info_TradeMessageInfo(detail)
+
+            result_data.append({
+                headlines[0]:cells[0].text,
+                headlines[1]: cells[1].text,
+                headlines[2]:detail_info
+
+            })
+        return result_data
     def collect_docs(self):
         pass
     def collect_additionally(self):
