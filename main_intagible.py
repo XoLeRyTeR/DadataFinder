@@ -354,11 +354,19 @@ class Parser:
         for row in elements_info:
             tds=row.find_elements(By.TAG_NAME,"td")
             if not tds[1].text:continue
-            data.append({
-                "key":tds[0].text,
-                "value":tds[1].text,
-                "href":self.__get_link_from_td(tds[1])
-            })
+            if "Объявление о торгах в ЕФРСБ"==tds[0].text.strip():
+                collect_link_info_cell_EFRSB=self.get_info_link_info_cell_EFRSB(tds[1].find_element(By.TAG_NAME, "a"))
+                data.append({
+                    "key":tds[0].text.strip(),
+                    "value":tds[1].text.strip(),
+                    "href":collect_link_info_cell_EFRSB
+                })
+            else:
+                data.append({
+                    "key": tds[0].text.strip(),
+                    "value": tds[1].text.strip(),
+                    "href": self.__get_link_from_td(tds[1])
+                })
         return data
     def get_headlines_auction(self):
         elements_headlines = self.wait.until(
