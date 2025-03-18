@@ -218,6 +218,18 @@ class Parser:
                 "value":info_lot
             })
         return info
+    def get_info_table_from_TradeMessageInfo(self,table):
+
+        # Получаем HTML-код таблицы
+        html = table.get_attribute('outerHTML')
+
+        # Преобразуем HTML в DataFrame
+        dataframe = pd.read_html(html)[0]
+
+        # Преобразуем DataFrame в словарь
+        table_dict = dataframe.to_dict(orient="list")
+        # Добавляем в список
+        return  table_dict
     def collect_messages(self):
         result_data=[]
         table_tr = self.wait.until(
