@@ -355,6 +355,10 @@ class Parser:
                         # Добавляем строку таблицы в результат с разделителем \t
                         result += "\t".join(row_data) + "\n"
         return result
+    def get_text_document_pdf(self,path_document)->str:
+        reader = pypdf.PdfReader(path_document)
+        return "\n".join([page.extract_text() for page in reader.pages])
+
     def get_info_docs(self, tag_link, ):
         result=[]
         name_docs=tag_link.text
