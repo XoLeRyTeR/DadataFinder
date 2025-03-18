@@ -39,6 +39,12 @@ class Parser:
             # options.add_argument('--headless=new')
             # options.add_argument('--disable-gpu')
             # options.add_argument('--no-sandbox')
+            options.add_experimental_option("prefs", {
+                "download.default_directory": PATH_DIR_TEMP,  # Указываем папку для скачивания
+                "download.prompt_for_download": False,  # Отключаем запрос подтверждения
+                "download.directory_upgrade": True,  # Включаем безопасный просмотр
+            })
+
             options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
             self.driver = webdriver.Chrome(
                 service=Service(executable_path=path_driver),
