@@ -531,24 +531,26 @@ class Parser:
 
 
     def run(self):
-        # self.driver.get(START_URL)
-        # self.select_classification()
-        # time.sleep(1)
-        # self.click_search_filters()
-        # time.sleep(10)
-        # self.collect_link_auctions_page()
-        # all_link_auctions=self.collect_all_link_on_auctions()
-        # pprint(all_link_auctions)
-        all_link_auctions=[
-            "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=905df1eb-ae54-4962-82ed-32d76fc8f6da"
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=8bf4e8fd-4088-4bbe-a0a4-af6f4b1f46d6',
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=a73875b1-8ff6-4dc7-99c1-b7e34fd76006',
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=ccb6d1ef-9293-4973-9c57-84c07418b58d',
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11eb4933-035e-4bfa-9a46-5fef8b273a2a',
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=27a47ab4-269c-4f21-a0fd-0357353bcff6',
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f29937fc-734b-423f-ab87-013c88bdcc39',
-            # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f6156a07-af21-4088-a1de-923ab32ed79a',
-        ]
+        self.driver.get(START_URL)
+        self.select_classification()
+        time.sleep(1)
+        self.click_search_filters()
+        time.sleep(10)
+        self.collect_link_auctions_page()
+        all_link_auctions=self.collect_all_link_on_auctions()
+        # all_link_auctions=[
+        #     "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=905df1eb-ae54-4962-82ed-32d76fc8f6da",
+        #     'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f29937fc-734b-423f-ab87-013c88bdcc39',
+        #     "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=a344e827-4bee-49c4-acc4-b0073307de64",
+        #     "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=9debafa1-6ea9-46c2-8959-2edcc54446d0"
+        #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=8bf4e8fd-4088-4bbe-a0a4-af6f4b1f46d6',
+        #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=a73875b1-8ff6-4dc7-99c1-b7e34fd76006',
+        #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=ccb6d1ef-9293-4973-9c57-84c07418b58d',
+        #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=11eb4933-035e-4bfa-9a46-5fef8b273a2a',
+        #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=27a47ab4-269c-4f21-a0fd-0357353bcff6',
+        #     #
+        #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f6156a07-af21-4088-a1de-923ab32ed79a',
+        # ]
         data={}
         for link_auction in all_link_auctions:
             result_link=[]
