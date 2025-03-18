@@ -37,6 +37,32 @@ class Parser:
             service=Service(executable_path='/opt/homebrew/bin/chromedriver'),
             options=options
         )
+        if name_browser=='Chrome':
+            options = webdriver.ChromeOptions()
+            # options.add_argument('--headless=new')
+            # options.add_argument('--disable-gpu')
+            # options.add_argument('--no-sandbox')
+            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+            self.driver = webdriver.Chrome(
+                service=Service(executable_path=path_driver),
+                options=options
+            )
+        elif name_browser=='Firefox':
+            options = webdriver.FirefoxOptions()
+            # Запуск браузера с указанным профилем
+            options.add_argument('-P default')
+            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+            self.driver = webdriver.Firefox(
+                service=Service(executable_path=path_driver),
+                options=options,
+            )
+        elif name_browser=="Safari":
+            options = webdriver.SafariOptions()
+            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+            self.driver = webdriver.Safari(
+                options=options
+            )
+
         self.wait = WebDriverWait(self.driver, 20)
     def select_classification(self):
         options_categories=[
