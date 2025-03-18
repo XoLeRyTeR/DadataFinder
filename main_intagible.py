@@ -323,6 +323,26 @@ class Parser:
 
             })
         return result_data
+    def get_info_docs(self, tag_link, ):
+        result=[]
+        name_docs=tag_link.text
+        tag_link.click()
+        time.sleep(5)
+        extract_dir = "data/temp/"
+        current_files = []
+        if name_docs.endswith(".zip"):
+            current_files.extend(self.unzip_acrhive_documents(name_docs,extract_dir))
+        elif name_docs.endswith(".docx") or name_docs.endswith(".doc") or name_docs.endswith(".pdf"):
+            current_files.append(os.path.join("data/temp/", name_docs))
+
+        for i,file in enumerate(current_files):
+            result.append({
+                "key":f"Documents_{str(i)}",
+                "value": self.get_text_document_pdf(file) if file.endswith(".pdf") else self.get_text_document_doc_docx(file)
+            })
+        self.__clear_temp_dir("data/temp/")
+        return result
+
     def collect_docs(self):
         result_data = []
         table_tr = self.wait.until(
