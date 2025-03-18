@@ -2,6 +2,8 @@ from pprint import pprint
 import re
 
 import json
+# TODO собрать "Объявление о торгах в ЕФРСБ	№13777116 опубликовано 11.03.2024"
+# TODO собрать документы
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
