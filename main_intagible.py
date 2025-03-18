@@ -197,25 +197,8 @@ class Parser:
             result_data[head]=type_callback[head]()
         return result_data
 
-    def get_headlines_auction(self):
-        elements_headlines = self.wait.until(
-            EC.presence_of_all_elements_located((By.XPATH, "//*[@id='ctl00_cphBody_rtsTrade']/div/ul/li"))
-        )
-        headlines_text=[li.text for li in elements_headlines]
-        return headlines_text
-    def get_info_from_table_auction(self):
-        data=[]
-        elements_info = self.wait.until(
-            EC.presence_of_all_elements_located((By.XPATH, "//table[@id='ctl00_cphBody_tableTradeInfo']//tr"))
-        )
-        for row in elements_info:
-            tds=row.find_elements(By.TAG_NAME,"td")
-            data.append({
-                "key":tds[0].text,
-                "value":tds[1].text,
-                "href":self.__get_link_from_td(tds[0])
-                         })
-        return data
+
+
 
 
 
