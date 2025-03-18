@@ -103,6 +103,12 @@ class Parser:
             return {"key": match.group("key").strip(), "value": match.group("value")}
         else:
             return {"key": "Лот", "value": text}
+    def __clear_temp_dir(self, PATH_DIR_TEMP):
+        for path in Path(PATH_DIR_TEMP).glob('*'):
+            if path.is_dir():
+                shutil.rmtree(path,ignore_errors=True)
+            else:
+                path.unlink()
     def generate_unique_string(self,length=10):
         # Используем буквы и цифры для создания строки
         characters = string.ascii_letters
