@@ -26,17 +26,8 @@ BASE_URL = 'https://old.bankrot.fedresurs.ru/'
 START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
 
 class Parser:
-    def __init__(self):
-        options = webdriver.ChromeOptions()
-        # options.add_argument('--headless=new')
-        # options.add_argument('--disable-gpu')
-        # options.add_argument('--no-sandbox')
-        options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+    def __init__(self,name_browser:str,path_driver:str):
 
-        self.driver = webdriver.Chrome(
-            service=Service(executable_path='/opt/homebrew/bin/chromedriver'),
-            options=options
-        )
         if name_browser=='Chrome':
             options = webdriver.ChromeOptions()
             # options.add_argument('--headless=new')
