@@ -9,18 +9,13 @@ import json
 
 import pypdf
 from spire.doc import Document,Paragraph,Table
-# TODO собрать "Объявление о торгах в ЕФРСБ	№13777116 опубликовано 11.03.2024"
-# TODO собрать документы
-import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import TimeoutException
 import time
 import pandas as pd
 import os
