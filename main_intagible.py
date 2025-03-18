@@ -30,7 +30,7 @@ import os
 
 BASE_URL = 'https://old.bankrot.fedresurs.ru/'
 START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
-
+PATH_DIR_TEMP="C:\\Users\\kuzic\\PycharmProjects\\DadataFinder\\data\\temp"
 class Parser:
     def __init__(self,name_browser:str,path_driver:str):
 
