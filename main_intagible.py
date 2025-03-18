@@ -119,18 +119,13 @@ class Parser:
         unique_string = ''.join(random.choice(characters) for _ in range(length))
         return unique_string
     def select_classification(self):
-        options_categories=[
-            "Права требования на краткосрочные долговые обязательства (дебиторская задолженность)",
-            "Ценные бумаги",
-            "Уступка требований по  кредитным обязательствам"
-        ]
         element_text_categories = self.wait.until(
             EC.presence_of_element_located((By.ID, "ctl00_cphBody_ucPropertyCategoriesSelect_tbSelectedText"))
         )
         element_text_categories.click()
         self.wait.until(EC.frame_to_be_available_and_switch_to_it((By.XPATH, "//tr[@class='rwContentRow']//iframe")))
         self.wait.until(EC.presence_of_element_located((By.ID, "ctl00_BodyPlaceHolder_divContainer")))
-        for option in options_categories:
+        for option in self.options_categories:
             text_element = self.wait.until(
                 EC.presence_of_element_located((By.XPATH, f"//span[@class='rtIn' and contains(text(), '{option}')]"))
             )
