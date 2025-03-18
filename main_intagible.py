@@ -565,6 +565,13 @@ class Parser:
 
 def main():
     p=Parser("Chrome",DRIVER_PATH)
+    options_categories = [
+        "Права требования на краткосрочные долговые обязательства (дебиторская задолженность)",
+        "Ценные бумаги",
+        "Уступка требований по  кредитным обязательствам"
+    ]
+    p=Parser("Chrome","chromedriver.exe")
+    p.init_options_categories(options_categories)
     p.run()
 
 if __name__ == '__main__':
