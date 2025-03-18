@@ -365,6 +365,55 @@ class Parser:
                     "value":field_value
                 })
         return data
+    def get_info_link_info_cell_EFRSB(self,tag_detail)->list:
+        data = []
+        time.sleep(2)
+        original_tab = self.driver.current_window_handle
+        # Находим кнопку, которая открывает новую страницу
+        tag_detail.click()
+
+        # Переключаемся на новую вкладку
+        new_tab = self.driver.window_handles[-1]  # Последняя вкладка
+        self.driver.switch_to.window(new_tab)
+
+        # Получаем информацию (например, заголовок страницы)
+        container = self.wait.until(
+            EC.presence_of_element_located((By.XPATH, f"//div[@class='containerInfo']"))
+        )
+        tables = self.driver.find_elements(By.XPATH, f"//div[@class='containerInfo']/table")
+        if tables:
+            for table in tables:
+                class_table=table.get_attribute('class')
+                if class_table == 'headInfo' or class_table == 'bodyInfo':
+                    try:
+                        header = table.find_element(By.XPATH, "./preceding-sibling::div[1]").find_element(By.TAG_NAME, "b").text.strip()
+                    except NoSuchElementException:
+                        header = self.generate_unique_string()
+                    table_info = self.get_info_table_from_TradeMessageInfo(table)
+                    data.append({
+                        "key": header,
+                        "value": table_info
+                    })
+                else:
+                    table_info = self.get_info_table_from_TradeMessageInfo(table)
+                    data.append({
+                        "key": class_table.strip(),
+                        "value": table_info
+                    })
+        soup = BeautifulSoup(container.get_attribute('innerHTML'), 'html.parser')
+        # Ищем все теги <b>
+        div_msg=soup.find_all('div',class_="msg")
+        for div in div_msg:
+            header = div.find('b').text.strip()
+            text = div.get_text(separator=' ').strip()
+            data.append({
+                "key": header,
+                "value": text
+            })
+        self.driver.close()
+        # Возвращаемся на исходную вкладку
+        self.driver.switch_to.window(original_tab)
+        return data
     def get_info_from_gen_table_auction(self):
         data=[]
         elements_info = self.wait.until(
