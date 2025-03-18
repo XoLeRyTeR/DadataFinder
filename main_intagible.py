@@ -141,6 +141,8 @@ class Parser:
         if match:
             total = int(match.group(1))
             return total
+        else:
+            return 0
     def collect_all_link_on_auctions(self):
         all_link=[]
         all_link.extend(self.collect_link_auctions_page())
