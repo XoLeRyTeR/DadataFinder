@@ -323,6 +323,38 @@ class Parser:
 
             })
         return result_data
+    def get_text_document_doc_docx(self,path_document)->str:
+        doc = Document()
+        doc.LoadFromFile(path_document)
+        result = ""
+
+        # Проход по всем элементам документа
+        for i in range(doc.Sections.Count):
+            section = doc.Sections.get_Item(i)
+            for j in range(section.Body.ChildObjects.Count):
+                obj = section.Body.ChildObjects.get_Item(j)
+                if isinstance(obj, Paragraph):
+                    # Если это текст, добавьте его в результат с разделителем \n
+                    text = obj.Text.strip()  # Убираем лишние пробелы
+                    if text:  # Добавляем только непустой текст
+                        result += text + "\n"
+                elif isinstance(obj, Table):
+                    # Если это таблица, извлеките её данные и добавьте в результат
+                    for row_idx in range(obj.Rows.Count):
+                        row = obj.Rows.get_Item(row_idx)
+                        row_data = []
+                        for cell_idx in range(row.Cells.Count):
+                            cell = row.Cells.get_Item(cell_idx)
+                            # Извлеките текст из всех параграфов в ячейке
+                            cell_text = ""
+                            for paragraph_idx in range(cell.Paragraphs.Count):
+                                paragraph = cell.Paragraphs.get_Item(paragraph_idx)
+                                cell_text += paragraph.Text + " "
+                            cell_text = cell_text.strip()  # Убираем лишние пробелы
+                            row_data.append(cell_text)
+                        # Добавляем строку таблицы в результат с разделителем \t
+                        result += "\t".join(row_data) + "\n"
+        return result
     def get_info_docs(self, tag_link, ):
         result=[]
         name_docs=tag_link.text
