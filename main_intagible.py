@@ -230,6 +230,52 @@ class Parser:
         table_dict = dataframe.to_dict(orient="list")
         # Добавляем в список
         return  table_dict
+    def get_info_TradeMessageInfo(self,tag_detail):
+        data=[]
+        time.sleep(2)
+        original_tab = self.driver.current_window_handle
+        # Находим кнопку, которая открывает новую страницу
+        tag_detail.click()
+
+        # Переключаемся на новую вкладку
+        new_tab = self.driver.window_handles[-1]  # Последняя вкладка
+        self.driver.switch_to.window(new_tab)
+
+        # Получаем информацию (например, заголовок страницы)
+        container=self.wait.until(
+            EC.presence_of_element_located((By.XPATH, f"//div[@class='containerInfo']"))
+        )
+        tables=self.driver.find_elements(By.XPATH, f"//div[@class='containerInfo']/table")
+        if tables:
+            for table in tables:
+                header = table.find_element(By.XPATH,"./preceding-sibling::b[1]").text.strip()
+                table_info=self.get_info_table_from_TradeMessageInfo(table)
+                data.append({
+                    "key":header,
+                    "value":table_info
+                })
+        soup = BeautifulSoup(container.get_attribute('innerHTML'), 'html.parser')
+        # Ищем все теги <b>
+        b_tags = soup.find_all('b')
+        data_keys=[item["key"] for item in data]
+        for b_tag in b_tags:
+
+            # Получаем текст ключа (убираем лишние символы, например, двоеточие)
+            key = b_tag.text.strip().rstrip(':')
+
+            if  data_keys and any([True if data_key in key else False for data_key in data_keys]):continue
+            # Получаем следующий элемент после тега <b>
+            next_element = b_tag.next_sibling
+
+            # Очищаем значение от лишних символов (например, &nbsp;)
+            value = next_element.text.strip() if next_element else ''
+            if value:data.append({"key": key, "value": value})
+
+
+        self.driver.close()
+        # Возвращаемся на исходную вкладку
+        self.driver.switch_to.window(original_tab)
+        return data
     def collect_messages(self):
         result_data=[]
         table_tr = self.wait.until(
