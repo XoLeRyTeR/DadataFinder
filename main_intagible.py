@@ -1,7 +1,14 @@
+import random
+import shutil
+import string
+from pathlib import Path
 from pprint import pprint
 import re
-
+import zipfile
 import json
+
+import pypdf
+from spire.doc import Document,Paragraph,Table
 # TODO собрать "Объявление о торгах в ЕФРСБ	№13777116 опубликовано 11.03.2024"
 # TODO собрать документы
 import requests
@@ -17,11 +24,10 @@ from selenium.common.exceptions import TimeoutException
 import time
 import pandas as pd
 import os
-from urllib.parse import urljoin
 
 # Настройки
 
-DRIVER_PATH = '/opt/homebrew/bin/chromedriver'
+
 BASE_URL = 'https://old.bankrot.fedresurs.ru/'
 START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
 
