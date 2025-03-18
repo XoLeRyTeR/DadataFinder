@@ -186,43 +186,83 @@ class Parser:
         self.driver.switch_to.window(original_tab)
         return text_details
     def collect_lots(self):
-        info=[]
-        name_lots=self.wait.until(
-            EC.presence_of_element_located((By.XPATH, f"//*[@id='ctl00_cphBody_rpvLots']"))
-        ).find_element(By.TAG_NAME,"div").find_element(By.TAG_NAME,"div").text
-        info.append(self.__get_number_lot(name_lots))
-        table_tr=self.wait.until(
-            EC.presence_of_all_elements_located((By.XPATH, f"//*[@id='ctl00_cphBody_lvLotList_ctrl0_tblTradeLot']/tbody/tr"))
+        info= []
+        divs_lots=self.wait.until(
+            EC.presence_of_all_elements_located((By.XPATH, f"//*[@id='ctl00_cphBody_rpvLots']/div"))
         )
+        for lot in divs_lots:
+            info_lot=[]
+            name_lots=lot.find_element(By.TAG_NAME,"div").text
+            table_tr=lot.find_element(By.TAG_NAME,"table").find_elements(By.TAG_NAME,"tr")
+            for tr in table_tr:
+                tds=tr.find_elements(By.TAG_NAME,"td")
+                if len(tds)==2:
+                    info_lot.append({
+                        "key":tds[0].text,
+                        "value":tds[1].text
+                    })
 
-        for tr in table_tr:
-            tds=tr.find_elements(By.TAG_NAME,"td")
-            if len(tds)==2:
-                info.append({
-                    "key":tds[0].text,
-                    "value":tds[1].text
-                })
-
-            else:
-                div_value=tds[0].find_element(By.TAG_NAME,"div")
-                try:
-                    detail=div_value.find_element(By.TAG_NAME,"a")
-                    detail_info=self.get_deatail_info(detail)
-                except NoSuchElementException:
-                    detail_info=div_value.text
-                info.append({
-                    "key":tds[0].find_element(By.TAG_NAME,"b").text,
-                    "value":detail_info.strip()
-                })
+                else:
+                    div_value=tds[0].find_element(By.TAG_NAME,"div")
+                    try:
+                        detail=div_value.find_element(By.TAG_NAME,"a")
+                        detail_info=self.get_detail_info_lots(detail)
+                    except NoSuchElementException:
+                        detail_info=div_value.text
+                    info_lot.append({
+                        "key":tds[0].find_element(By.TAG_NAME,"b").text,
+                        "value":detail_info.strip()
+                    })
+            info.append({
+                "key":name_lots,
+                "value":info_lot
+            })
         return info
     def collect_messages(self):
         pass
     def collect_docs(self):
         pass
     def collect_additionally(self):
-        pass
-    def all_data_about_auction_in_headlines(self,headlines):
-        result_data=dict()
+        data=[]
+        table = self.wait.until(
+            EC.presence_of_element_located((By.XPATH, "//*[@id='ctl00_cphBody_rpvOther']/table"))
+        )
+        rows = table.find_elements(By.TAG_NAME, 'tr')
+
+        # Обрабатываем каждую строку
+        for row in rows:
+            # Находим все ячейки в строке
+            cells = row.find_elements(By.TAG_NAME, 'td')
+
+            # Проверяем, что строка содержит две ячейки (название поля и значение)
+            if len(cells) == 2:
+                field_name = cells[0].text.strip()  # Название поля
+                field_value = cells[1].text.strip()  # Значение поля
+                data.append({
+                    "key":field_name,
+                    "value":field_value
+                })
+        return data
+    def get_info_from_gen_table_auction(self):
+        data=[]
+        elements_info = self.wait.until(
+            EC.presence_of_all_elements_located((By.XPATH, "//table[@id='ctl00_cphBody_tableTradeInfo']//tr"))
+        )
+        for row in elements_info:
+            tds=row.find_elements(By.TAG_NAME,"td")
+            if not tds[1].text:continue
+            data.append({
+                "key":tds[0].text,
+                "value":tds[1].text,
+                "href":self.__get_link_from_td(tds[1])
+            })
+        return data
+    def get_headlines_auction(self):
+        elements_headlines = self.wait.until(
+                EC.presence_of_all_elements_located((By.XPATH, "//*[@id='ctl00_cphBody_rtsTrade']/div/ul/li"))
+            )
+        headlines_text=[li.text for li in elements_headlines]
+        return headlines_text
     def get_all_data_about_auction_in_headlines(self, headlines):
         result_data=[]
         type_callback={
