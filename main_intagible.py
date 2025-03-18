@@ -167,25 +167,7 @@ class Parser:
                 print("last page")
                 break
         return list(set(all_link))
-
-    def __get_link_from_td(self,td_dom):
-        try:
-            return str(td_dom.find_element(By.TAG_NAME,"a").get_attribute("href"))
-        except NoSuchElementException:
-            return ""
-    def __get_number_lot(self,text):
-        # Регулярное выражение для извлечения ключа и значения
-        pattern = r"(?P<key>\D+)\s*№\s*(?P<value>\d+)"
-
-        # Поиск совпадений
-        match = re.search(pattern, text)
-
-        # Создание словаря
-        if match:
-            return {"key": match.group("key").strip(), "value": match.group("value")}
-        else:
-            return {"key": "Лот", "value": text}
-    def get_deatail_info(self,tag_detail):
+    def get_detail_info_lots(self, tag_detail):
         original_tab = self.driver.current_window_handle
         # Находим кнопку, которая открывает новую страницу
         tag_detail.click()
