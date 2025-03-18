@@ -55,6 +55,30 @@ class Parser:
             )
 
         self.wait = WebDriverWait(self.driver, 20)
+    def __get_link_in_a_onclick(self,onclick_text):
+        pattern = r"openNewWin\('([^']+)'"
+
+        # Поиск совпадений
+        match = re.search(pattern, onclick_text)
+
+        # Проверка, найдено ли совпадение, и извлечение результата
+        if match:
+            result = match.group(1)  # Извлекаем первую группу (то, что в скобках)
+            return result
+        else:
+            return ""
+    def __get_link_from_td(self,td_dom):
+        try:
+            link=td_dom.find_element(By.TAG_NAME,"a").get_attribute("href")
+            if link:return link
+            else:
+                link=td_dom.find_element(By.TAG_NAME,"a").get_attribute("onclick")
+                link=self.__get_link_in_a_onclick(link)
+                if link:return "https://old.bankrot.fedresurs.ru"+link
+                else:return ""
+
+        except NoSuchElementException:
+            return ""
     def __get_number_lot(self,text):
         # Регулярное выражение для извлечения ключа и значения
         pattern = r"(?P<key>\D+)\s*№\s*(?P<value>\d+)"
