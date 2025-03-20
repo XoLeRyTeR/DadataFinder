@@ -589,9 +589,8 @@ def main():
         "Ценные бумаги",
         "Уступка требований по  кредитным обязательствам"
     ]
-    p=Parser("Chrome","chromedriver.exe")
+    p=Parser(NAME_BROWSER)
     p.init_options_categories(options_categories)
     p.run()
-
 if __name__ == '__main__':
     main()
