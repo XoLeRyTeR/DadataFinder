@@ -1,11 +1,11 @@
 FROM python:3.10-slim
+
+# Обновляем пакеты и устанавливаем необходимые зависимости
+RUN apt-get update && apt-get install -y \
+    libreoffice \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-#test
 
-COPY *.py *.json requirements.txt /app
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-EXPOSE 8501
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl --fail http://localhost:8501/ || exit 1
-CMD ["streamlit", "run", "main.py"]
