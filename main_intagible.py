@@ -24,12 +24,26 @@ import time
 import pandas as pd
 import os
 
+
 # Настройки
-
-
+parser = argparse.ArgumentParser(description="Trades")
+parser.add_argument(
+    "--name_browser",  # Имя аргумента
+    type=str,   # Тип значения (можно изменить на int, float и т.д.)
+    required=True,  # Обязательный аргумент
+    help="Название браузера"
+)
+parser.add_argument(
+    "--temp_dir",  # Имя аргумента
+    type=str,   # Тип значения (можно изменить на int, float и т.д.)
+    required=True,  # Обязательный аргумент
+    help="Название браузера"
+)
+args = parser.parse_args()
+NAME_BROWSER=args.name_browser
 BASE_URL = 'https://old.bankrot.fedresurs.ru/'
 START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
-PATH_DIR_TEMP="C:\\Users\\kuzic\\PycharmProjects\\DadataFinder\\data\\temp"
+PATH_DIR_TEMP=args.temp_dir
 class Parser:
     def __init__(self,name_browser:str,path_driver:str):
         self.options_categories = []
