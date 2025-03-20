@@ -4,12 +4,16 @@ import string
 from pathlib import Path
 from pprint import pprint
 import re
+import argparse
 import zipfile
 import json
-
+import docx
+import subprocess
 import pypdf
-from spire.doc import Document,Paragraph,Table
+from io import StringIO
 from selenium import webdriver
+from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
