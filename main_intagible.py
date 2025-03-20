@@ -425,11 +425,13 @@ class Parser:
             current_files.extend(self.unzip_acrhive_documents(name_docs,extract_dir))
         elif name_docs.endswith(".docx") or name_docs.endswith(".doc") or name_docs.endswith(".pdf"):
             current_files.append(os.path.join("data/temp/", name_docs))
-
         for i,file in enumerate(current_files):
+            if file.endswith(".doc"):
+                file=self.convert_doc_to_docx(file)+"x"
+            file_name=os.path.basename(file)
             result.append({
-                "key":f"Documents_{str(i)}",
-                "value": self.get_text_document_pdf(file) if file.endswith(".pdf") else self.get_text_document_doc_docx(file)
+                "key":file_name,
+                "value": self.get_text_document_pdf(file) if file.endswith(".pdf") else self.get_text_document_docx(file)
             })
         self.__clear_temp_dir("data/temp/")
         return result
