@@ -343,34 +343,6 @@ class Parser:
         return result_data
     def get_text_document_docx(self,path_document)->str:
 
-        # Проход по всем элементам документа
-        for i in range(doc.Sections.Count):
-            section = doc.Sections.get_Item(i)
-            for j in range(section.Body.ChildObjects.Count):
-                obj = section.Body.ChildObjects.get_Item(j)
-                if isinstance(obj, Paragraph):
-                    # Если это текст, добавьте его в результат с разделителем \n
-                    text = obj.Text.strip()  # Убираем лишние пробелы
-                    if text:  # Добавляем только непустой текст
-                        result += text + "\n"
-                elif isinstance(obj, Table):
-                    # Если это таблица, извлеките её данные и добавьте в результат
-                    for row_idx in range(obj.Rows.Count):
-                        row = obj.Rows.get_Item(row_idx)
-                        row_data = []
-                        for cell_idx in range(row.Cells.Count):
-                            cell = row.Cells.get_Item(cell_idx)
-                            # Извлеките текст из всех параграфов в ячейке
-                            cell_text = ""
-                            for paragraph_idx in range(cell.Paragraphs.Count):
-                                paragraph = cell.Paragraphs.get_Item(paragraph_idx)
-                                cell_text += paragraph.Text + " "
-                            cell_text = cell_text.strip()  # Убираем лишние пробелы
-                            row_data.append(cell_text)
-                        # Добавляем строку таблицы в результат с разделителем \t
-                        result += "\t".join(row_data) + "\n"
-        return result
-    def unzip_acrhive_documents(self,name_docs,extract_dir)->list:
         doc = docx.Document(path_document)
         result = []
 
@@ -391,6 +363,35 @@ class Parser:
 
         return "\n".join(result)
 
+    def convert_doc_to_docx(self,doc_path):
+        """
+        Конвертирует .doc файл в .docx с помощью LibreOffice и сохраняет в ту же директорию.
+
+        :param doc_path: Путь к исходному .doc файлу.
+        """
+        try:
+            # Проверяем, существует ли исходный файл
+            if not os.path.exists(doc_path):
+                raise FileNotFoundError(f"Файл {doc_path} не найден.")
+
+            # Получаем директорию и имя файла без расширения
+            file_dir = os.path.dirname(doc_path)
+            file_name = os.path.splitext(os.path.basename(doc_path))[0]
+
+            # Запуск LibreOffice в headless-режиме для конвертации
+            command = [
+                "lowriter", "--headless", "--convert-to", "docx",
+                "--outdir", file_dir, doc_path
+            ]
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            pass
+        except Exception as e:
+            pass
+        os.remove(doc_path)
+        return os.path.join(doc_path)
+
+    def unzip_acrhive_documents(self,name_docs,extract_dir,encoding_from='cp437', encoding_to='cp866')->list:
         current_files=[]
         with zipfile.ZipFile(os.path.join("data/temp/", name_docs), 'r') as zip_ref:
             zip_ref.extractall(extract_dir)
