@@ -341,10 +341,7 @@ class Parser:
 
             })
         return result_data
-    def get_text_document_doc_docx(self,path_document)->str:
-        doc = Document()
-        doc.LoadFromFile(path_document)
-        result = ""
+    def get_text_document_docx(self,path_document)->str:
 
         # Проход по всем элементам документа
         for i in range(doc.Sections.Count):
@@ -374,6 +371,26 @@ class Parser:
                         result += "\t".join(row_data) + "\n"
         return result
     def unzip_acrhive_documents(self,name_docs,extract_dir)->list:
+        doc = docx.Document(path_document)
+        result = []
+
+        for element in doc.element.body:
+            if element.tag.endswith('p'):  # Если это параграф (текст)
+                paragraph = element
+                text = paragraph.text.strip()
+                if text:
+                    result.append(text)
+            elif element.tag.endswith('tbl'):  # Если это таблица
+                table = element
+                for row in table.xpath(".//w:tr"):
+                    row_data = []
+                    for cell in row.xpath(".//w:tc"):
+                        cell_text = "".join(node.text for node in cell.xpath(".//w:t"))
+                        row_data.append(cell_text.strip())
+                    result.append("\t".join(row_data))
+
+        return "\n".join(result)
+
         current_files=[]
         with zipfile.ZipFile(os.path.join("data/temp/", name_docs), 'r') as zip_ref:
             zip_ref.extractall(extract_dir)
