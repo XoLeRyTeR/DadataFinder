@@ -20,3 +20,10 @@ The project was created to collect information about auctions
 ```
   PATH_DIR_TEMP="<your path>/DadataFinder/data/temp"
   ```
+## RUN
+```
+docker build --progress=plain -t cvcode_test .
+python3 main_intagible.py --name_browser Firefox --temp_dir /app/data/temp/
+
+  ```
+
