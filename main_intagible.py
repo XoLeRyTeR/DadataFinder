@@ -45,13 +45,13 @@ BASE_URL = 'https://old.bankrot.fedresurs.ru/'
 START_URL = 'https://old.bankrot.fedresurs.ru/TradeList.aspx'
 PATH_DIR_TEMP=args.temp_dir
 class Parser:
-    def __init__(self,name_browser:str,path_driver:str):
+    def __init__(self,name_browser:str):
         self.options_categories = []
         if name_browser=='Chrome':
             options = webdriver.ChromeOptions()
-            # options.add_argument('--headless=new')
-            # options.add_argument('--disable-gpu')
-            # options.add_argument('--no-sandbox')
+            options.add_argument('-headless')
+            options.add_argument('--window-size=1920,1080')
+            options.add_argument('start-maximized')
             options.add_experimental_option("prefs", {
                 "download.default_directory": PATH_DIR_TEMP,  # Указываем папку для скачивания
                 "download.prompt_for_download": False,  # Отключаем запрос подтверждения
@@ -60,17 +60,24 @@ class Parser:
 
             options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
             self.driver = webdriver.Chrome(
-                service=Service(executable_path=path_driver),
+                service=Service(ChromeDriverManager().install()),
                 options=options
             )
         elif name_browser=='Firefox':
             options = webdriver.FirefoxOptions()
+            options.add_argument('-headless')
+            options.add_argument('--window-size=1920,1080')
+            options.add_argument('start-maximized')
+            options.set_preference("browser.download.folderList", 2)
+            options.set_preference("browser.download.dir", PATH_DIR_TEMP)
+            options.set_preference("browser.download.manager.showWhenStarting", False)
+            options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream")
+
             # Запуск браузера с указанным профилем
-            options.add_argument('-P default')
             options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
             self.driver = webdriver.Firefox(
-                service=Service(executable_path=path_driver),
-                options=options,
+                service=Service(GeckoDriverManager().install()),
+                options=options
             )
         elif name_browser=="Safari":
             options = webdriver.SafariOptions()
@@ -78,7 +85,6 @@ class Parser:
             self.driver = webdriver.Safari(
                 options=options
             )
-
         self.wait = WebDriverWait(self.driver, 20)
     def init_options_categories(self,categories:list):
         self.options_categories = categories
@@ -95,6 +101,7 @@ class Parser:
             return result
         else:
             return ""
+
     def __get_link_from_td(self,td_dom):
         try:
             link=td_dom.find_element(By.TAG_NAME,"a").get_attribute("href")
