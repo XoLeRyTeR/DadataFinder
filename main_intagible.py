@@ -266,7 +266,7 @@ class Parser:
         html = table.get_attribute('outerHTML')
 
         # Преобразуем HTML в DataFrame
-        dataframe = pd.read_html(html)[0]
+        dataframe = pd.read_html(StringIO(html))[0]
 
         # Преобразуем DataFrame в словарь
         table_dict = dataframe.to_dict(orient="list")
