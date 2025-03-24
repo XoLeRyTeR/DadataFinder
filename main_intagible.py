@@ -508,15 +508,18 @@ class Parser:
 
         # Проходим по строкам таблицы
         for row in rows:
-            # Извлекаем ячейки в строке
-            cells = row.find_elements(By.TAG_NAME, 'td')
-            detail = cells[1].find_element(By.TAG_NAME, "a")
-            detail_info = self.get_info_docs(detail)
-
-            result_data.append({
-                headlines[0]: cells[0].text,
-                headlines[1]: detail_info,
-            })
+            try:
+                # Извлекаем ячейки в строке
+                cells = row.find_elements(By.TAG_NAME, 'td')
+                detail = cells[1].find_element(By.TAG_NAME, "a")
+                detail_info = self.get_info_docs(detail)
+                result_data.append({
+                    headlines[0]: cells[0].text,
+                    headlines[1]: detail_info,
+                })
+            except UnexpectedAlertPresentException as e:
+                print(e)
+                continue
         return result_data
     def collect_additionally(self):
         data=[]
