@@ -442,22 +442,31 @@ class Parser:
 
     def unzip_acrhive_documents(self,name_docs,extract_dir,encoding_from='cp437', encoding_to='cp866')->list:
         current_files=[]
-        with zipfile.ZipFile(os.path.join("data/temp/", name_docs), 'r') as zip_ref:
-            for file in zip_ref.namelist():
-                # Исправляем кодировку имени файла
-                corrected_name = file.encode(encoding_from).decode(encoding_to)
+        try:
+            with zipfile.ZipFile(os.path.join("data/temp/", name_docs), 'r') as zip_ref:
+                for i,file in enumerate(zip_ref.namelist()):
+                    # Исправляем кодировку имени файла
+                    try:
+                        corrected_name = file.encode(encoding_from).decode(encoding_to)
+                    except UnicodeDecodeError:
+                        corrected_name = f"Document_{i}"+Path(file).suffix
+                    except UnicodeEncodeError:
+                        corrected_name = f"Document_{i}"+Path(file).suffix
+                    # Создаём полный путь для сохранения файла
+                    full_path = os.path.join(extract_dir, corrected_name)
+                    if full_path.endswith(".doc") or full_path.endswith(".docx") or full_path.endswith(".pdf"):
+                        zip_ref.extract(file, extract_dir)
 
-                # Создаём полный путь для сохранения файла
-                full_path = os.path.join(extract_dir, corrected_name)
-                if full_path.endswith(".doc") or full_path.endswith(".docx") or full_path.endswith(".pdf"):
-                    current_files.append(full_path)
-                    # Создаём папки, если их нет
-                    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+                        current_files.append(full_path)
+                        # Создаём папки, если их нет
+                        os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
-                    # Записываем файл
-                    with open(full_path, 'wb') as f:
-                        f.write(zip_ref.read(file))
+                        # Записываем файл
+                        with open(full_path, 'wb') as f:
+                            f.write(zip_ref.read(file))
 
+        except zipfile.BadZipFile as e:
+            return []
         return current_files
     def get_text_document_pdf(self,path_document)->str:
         reader = pypdf.PdfReader(path_document)
