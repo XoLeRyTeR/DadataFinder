@@ -378,17 +378,20 @@ class Parser:
 
         # Проходим по строкам таблицы
         for row in rows:
-            # Извлекаем ячейки в строке
-            cells = row.find_elements(By.TAG_NAME, 'td')
-            detail = cells[2].find_element(By.TAG_NAME, "a")
-            detail_info = self.get_info_TradeMessageInfo(detail)
+            try:
+                # Извлекаем ячейки в строке
+                cells = row.find_elements(By.TAG_NAME, 'td')
+                detail = cells[2].find_element(By.TAG_NAME, "a")
+                detail_info = self.get_info_TradeMessageInfo(detail)
 
-            result_data.append({
-                headlines[0]:cells[0].text,
-                headlines[1]: cells[1].text,
-                headlines[2]:detail_info
+                result_data.append({
+                    headlines[0]:cells[0].text,
+                    headlines[1]: cells[1].text,
+                    headlines[2]:detail_info
 
-            })
+                })
+            except StaleElementReferenceException as e:
+                continue
         return result_data
     def get_text_document_docx(self,path_document)->str:
 
