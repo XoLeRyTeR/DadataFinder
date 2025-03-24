@@ -237,7 +237,10 @@ class Parser:
             all_tr=td.find_elements(By.TAG_NAME,"a")
             last_page_current_slideboard=all_tr[-1].text
             for i,a in enumerate(all_tr):
-                if a.text=="..." and i==0:
+                try:
+                    if a.text == "..." and i == 0:
+                        continue
+                except StaleElementReferenceException as e:
                     continue
                 if a.text=="..."  or (str(page)==a.text and a.text.isdecimal()):
                     if page==42:
