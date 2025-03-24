@@ -702,7 +702,9 @@ class Parser:
                     print(time.time()-time_link)
                     time_link=time.time()
                 except NoSuchWindowException:
-                    self.__init__(NAME_BROWSER)  # Пересоздаём драйвер
+                    self.__init__(NAME_BROWSER)
+                except Exception :
+                    self.__init__(NAME_BROWSER)# Пересоздаём драйвер
 
         end_time = time.time()
         print(end_time)
