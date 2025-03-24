@@ -243,11 +243,12 @@ class Parser:
                 except StaleElementReferenceException as e:
                     continue
                 if a.text=="..."  or (str(page)==a.text and a.text.isdecimal()):
-                    if page==42:
-                        print("stop")
-                    time.sleep(1)
-                    a.click()
-                    time.sleep(2)
+                    try:
+                        a.click()
+                        time.sleep(3)
+                    except StaleElementReferenceException:
+                        time.sleep(4)
+                        a.click()
                     all_link.extend(self.collect_link_auctions_page())
                     break
             if last_page_current_slideboard==str(page):
