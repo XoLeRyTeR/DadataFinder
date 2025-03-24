@@ -8,6 +8,8 @@ import argparse
 import zipfile
 import json
 import docx
+from fake_useragent import UserAgent
+from docx.opc.exceptions import PackageNotFoundError
 import subprocess
 import pypdf
 from io import StringIO
