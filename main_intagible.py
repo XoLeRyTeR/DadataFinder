@@ -330,34 +330,37 @@ class Parser:
         self.driver.switch_to.window(new_tab)
 
         # Получаем информацию (например, заголовок страницы)
-        container=self.wait.until(
-            EC.presence_of_element_located((By.XPATH, f"//div[@class='containerInfo']"))
-        )
-        tables=self.driver.find_elements(By.XPATH, f"//div[@class='containerInfo']/table")
-        if tables:
-            for table in tables:
-                header = table.find_element(By.XPATH,"./preceding-sibling::b[1]").text.strip()
-                table_info=self.get_info_table_from_TradeMessageInfo(table)
-                data.append({
-                    "key":header,
-                    "value":table_info
-                })
-        soup = BeautifulSoup(container.get_attribute('innerHTML'), 'html.parser')
-        # Ищем все теги <b>
-        b_tags = soup.find_all('b')
-        data_keys=[item["key"] for item in data]
-        for b_tag in b_tags:
+        try:
+            container=self.wait.until(
+                EC.presence_of_element_located((By.XPATH, f"//div[@class='containerInfo']"))
+            )
+            tables=self.driver.find_elements(By.XPATH, f"//div[@class='containerInfo']/table")
+            if tables:
+                for table in tables:
+                    header = table.find_element(By.XPATH,"./preceding-sibling::b[1]").text.strip()
+                    table_info=self.get_info_table_from_TradeMessageInfo(table)
+                    data.append({
+                        "key":header,
+                        "value":table_info
+                    })
+            soup = BeautifulSoup(container.get_attribute('innerHTML'), 'html.parser')
+            # Ищем все теги <b>
+            b_tags = soup.find_all('b')
+            data_keys=[item["key"] for item in data]
+            for b_tag in b_tags:
 
-            # Получаем текст ключа (убираем лишние символы, например, двоеточие)
-            key = b_tag.text.strip().rstrip(':')
+                # Получаем текст ключа (убираем лишние символы, например, двоеточие)
+                key = b_tag.text.strip().rstrip(':')
 
-            if  data_keys and any([True if data_key in key else False for data_key in data_keys]):continue
-            # Получаем следующий элемент после тега <b>
-            next_element = b_tag.next_sibling
+                if  data_keys and any([True if data_key in key else False for data_key in data_keys]):continue
+                # Получаем следующий элемент после тега <b>
+                next_element = b_tag.next_sibling
 
-            # Очищаем значение от лишних символов (например, &nbsp;)
-            value = next_element.text.strip() if next_element else ''
-            if value:data.append({"key": key, "value": value})
+                # Очищаем значение от лишних символов (например, &nbsp;)
+                value = next_element.text.strip() if next_element else ''
+                if value:data.append({"key": key, "value": value})
+        except TimeoutException as e:
+            print(e)
 
 
         self.driver.close()
