@@ -708,6 +708,10 @@ class Parser:
         print(elapsed_time)
 
 
+# read
+# with open("data.jsonl", "r", encoding="utf-8") as f:
+#     for line in f:
+#         print(json.loads(line))
 def main():
     init_db()
     options_categories = [
