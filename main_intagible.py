@@ -230,7 +230,10 @@ class Parser:
         count_all_auctions = self.__get_count_all_auctions(self.driver.find_element(By.ID, "ctl00_cphBody_PaggingAdvInfo1_tdPaggingAdvInfo").text.strip())
         for page in range(2,count_all_auctions+1):
             pprint(f"page : {page}")
-            td=self.driver.find_element(By.XPATH,"//*[@id='ctl00_cphBody_gvTradeList']/tbody/tr[22]/td/table/tbody/tr")
+            print(len(set(all_link)))
+            td=self.wait.until(
+                EC.presence_of_element_located((By.XPATH,"//*[@id='ctl00_cphBody_gvTradeList']/tbody/tr[22]/td/table/tbody/tr"))
+            )
             all_tr=td.find_elements(By.TAG_NAME,"a")
             last_page_current_slideboard=all_tr[-1].text
             for i,a in enumerate(all_tr):
