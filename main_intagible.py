@@ -476,8 +476,8 @@ class Parser:
         result=[]
         name_docs=tag_link.text
         tag_link.click()
-        time.sleep(5)
-        extract_dir = PATH_DIR_TEMP+"/docs"
+        time.sleep(2)
+        extract_dir = PATH_DIR_TEMP+"docs"
         current_files = []
         if name_docs.endswith(".zip"):
             current_files.extend(self.unzip_acrhive_documents(name_docs,extract_dir))
