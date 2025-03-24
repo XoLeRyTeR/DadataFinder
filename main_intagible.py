@@ -27,6 +27,8 @@ import time
 import pandas as pd
 import os
 
+from utils.config import config
+from utils.database import init_db, insert_link_collect, get_links_not_collect, update_status_collect_link
 
 # Настройки
 parser = argparse.ArgumentParser(description="Trades")
