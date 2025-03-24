@@ -203,7 +203,10 @@ class Parser:
         rows = self.driver.find_elements(By.XPATH, "//table[@id='ctl00_cphBody_gvTradeList']//tr")
         trade_link = []
         for row in rows:
-            trade_type_cell = row.find_elements(By.XPATH, ".//td[6]")
+            try:
+                trade_type_cell = row.find_elements(By.XPATH, ".//td[6]")
+            except StaleElementReferenceException:
+                continue
             if trade_type_cell:
                 try:
                     trade_a = trade_type_cell[0].find_element(By.XPATH, ".//a")
