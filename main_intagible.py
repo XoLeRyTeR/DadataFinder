@@ -635,19 +635,27 @@ class Parser:
             result_data.append({"key":head,"value":type_callback[head]()})
         return result_data
 
-
-
-
-
-
     def run(self):
-        self.driver.get(START_URL)
-        self.select_classification()
-        time.sleep(1)
-        self.click_search_filters()
-        time.sleep(10)
-        self.collect_link_auctions_page()
-        all_link_auctions=self.collect_all_link_on_auctions()
+        start_time = time.time()
+        print(start_time)
+        while True:
+            try:
+                self.driver.get(START_URL)
+                self.select_classification()
+                print("выбрали опции")
+                time.sleep(1)
+                self.click_search_filters()
+                print("отфильтровали")
+                time.sleep(5)
+                all_link_auctions=self.collect_all_link_on_auctions()
+                break
+            except Exception as e:
+                print(e)
+        all_link_time = time.time()
+        print(all_link_time)
+        # разница между конечным и начальным временем
+        elapsed_time = all_link_time - start_time
+        print(elapsed_time)
         # all_link_auctions=[
         #     "https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=905df1eb-ae54-4962-82ed-32d76fc8f6da",
         #     'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f29937fc-734b-423f-ab87-013c88bdcc39',
@@ -661,21 +669,47 @@ class Parser:
         #     #
         #     # 'https://old.bankrot.fedresurs.ru/TradeCard.aspx?ID=f6156a07-af21-4088-a1de-923ab32ed79a',
         # ]
-        data={}
-        for link_auction in all_link_auctions:
-            result_link=[]
-            self.driver.get(link_auction)
-            time.sleep(1)
-            result_link.extend(self.get_info_from_gen_table_auction())
-            headlines_auction=self.get_headlines_auction()
-            result_link.extend(self.get_all_data_about_auction_in_headlines(headlines_auction))
-            data[link_auction]=result_link
 
-        with open("dict_to_json_textfile_2.json", "w", encoding="utf-8") as fout:
-            json.dump(data, fout, ensure_ascii=False, indent=4)
+        for link in all_link_auctions:insert_link_collect(link)
+        all_link_auctions.clear()
+        time_link=time.time()
+        while True:
+            need_link_collect = get_links_not_collect()
+            count_link = len(need_link_collect)
+            if not need_link_collect:
+                break
+            for i,link_auction in enumerate(need_link_collect):
+                try:
+                    print(f"{i+1}/{count_link} href: {link_auction}")
+                    result_link=[]
+                    self.driver.get(link_auction)
+                    time.sleep(1)
+                    result_link.extend(self.get_info_from_gen_table_auction())
+                    headlines_auction=self.get_headlines_auction()
+                    result_link.extend(self.get_all_data_about_auction_in_headlines(headlines_auction))
+                    if i%30==0:
+                        self.__init__(NAME_BROWSER)
+                    data=dict()
+                    data[link_auction] = result_link
+                    with open("data.jsonl", "a", encoding="utf-8") as f:
+                        f.write(json.dumps(data, ensure_ascii=False,) + "\n")
+                    update_status_collect_link(link_auction)
+                    data.clear() # перестраховка (необязательно)
+                    result_link.clear()
+                    print(time.time()-time_link)
+                    time_link=time.time()
+                except NoSuchWindowException:
+                    self.__init__(NAME_BROWSER)  # Пересоздаём драйвер
+
+        end_time = time.time()
+        print(end_time)
+        # разница между конечным и начальным временем
+        elapsed_time = end_time - start_time
+        print(elapsed_time)
 
 
 def main():
+    init_db()
     options_categories = [
         "Права требования на краткосрочные долговые обязательства (дебиторская задолженность)",
         "Ценные бумаги",
