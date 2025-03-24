@@ -487,10 +487,13 @@ class Parser:
             if file.endswith(".doc"):
                 file=self.convert_doc_to_docx(file)+"x"
             file_name=os.path.basename(file)
-            result.append({
-                "key":file_name,
-                "value": self.get_text_document_pdf(file) if file.endswith(".pdf") else self.get_text_document_docx(file)
-            })
+            try:
+                result.append({
+                    "key":file_name,
+                    "value": self.get_text_document_pdf(file) if file.endswith(".pdf") else self.get_text_document_docx(file)
+                })
+            except PackageNotFoundError as e:
+                print(e)
         self.__clear_temp_dir("data/temp/")
         return result
 
