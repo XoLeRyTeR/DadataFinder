@@ -60,45 +60,68 @@ type_start_headless= True if args.headless=="True" else False
 class Parser:
     def __init__(self,name_browser:str):
         self.options_categories = []
+        self.ua = UserAgent()
+
         if name_browser=='Chrome':
-            options = webdriver.ChromeOptions()
-            options.add_argument('-headless')
-            options.add_argument('--window-size=1920,1080')
-            options.add_argument('start-maximized')
-            options.add_experimental_option("prefs", {
-                "download.default_directory": PATH_DIR_TEMP,  # Указываем папку для скачивания
-                "download.prompt_for_download": False,  # Отключаем запрос подтверждения
-                "download.directory_upgrade": True,  # Включаем безопасный просмотр
-            })
-
-            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-            self.driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()),
-                options=options
-            )
+            self.driver = self.__init_chrome()
         elif name_browser=='Firefox':
-            options = webdriver.FirefoxOptions()
-            options.add_argument('-headless')
-            options.add_argument('--window-size=1920,1080')
-            options.add_argument('start-maximized')
-            options.set_preference("browser.download.folderList", 2)
-            options.set_preference("browser.download.dir", PATH_DIR_TEMP)
-            options.set_preference("browser.download.manager.showWhenStarting", False)
-            options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream")
-
-            # Запуск браузера с указанным профилем
-            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-            self.driver = webdriver.Firefox(
-                service=Service(GeckoDriverManager().install()),
-                options=options
-            )
+            self.driver = self.__init_firefox()
         elif name_browser=="Safari":
-            options = webdriver.SafariOptions()
-            options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
-            self.driver = webdriver.Safari(
-                options=options
-            )
+            self.driver = self.__init_safari()
         self.wait = WebDriverWait(self.driver, 20)
+    def __init_chrome(self):
+        options = webdriver.ChromeOptions()
+        if type_start_headless:
+            options.add_argument('-headless')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('start-maximized')
+        options.add_argument("--disable-download-notifications")
+        options.add_argument("--disable-gpu")
+        options.add_argument("--disable-extensions")
+        options.add_argument("--disable-infobars")
+        options.add_experimental_option("prefs", {
+            "download.default_directory": PATH_DIR_TEMP,  # Указываем папку для скачивания
+            "download.prompt_for_download": False,  # Отключаем запрос подтверждения
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": False,  # Отключить проверку безопасности (для PDF)
+            "profile.default_content_settings.popups": 0,
+            # Включаем безопасный просмотр
+        })
+
+        options.add_argument(f'user-agent={self.ua.random}')
+        driver = webdriver.Chrome(
+            service=Service(ChromeDriverManager().install()),
+            options=options
+        )
+        return driver
+    def __init_firefox(self):
+        options = webdriver.FirefoxOptions()
+        if type_start_headless:
+            options.add_argument('-headless')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('start-maximized')
+        options.set_preference("browser.download.folderList", 2)
+        options.set_preference("browser.download.dir", PATH_DIR_TEMP)
+        options.set_preference("browser.download.manager.showWhenStarting", False)
+        options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream")
+        options.set_preference("browser.download.manager.showWhenStarting", False)
+
+        # Запуск браузера с указанным профилем
+        options.add_argument(f'user-agent={self.ua.random}')
+        driver = webdriver.Firefox(
+            service=Service(GeckoDriverManager().install()),
+            options=options
+        )
+        return driver
+    def __init_safari(self):
+        options = webdriver.SafariOptions()
+        options.add_argument(f'user-agent={self.ua.random}')
+        driver = webdriver.Safari(
+            options=options
+        )
+        return driver
+    def __init_wait(self):
+        return WebDriverWait(self.driver, 20)
     def init_options_categories(self,categories:list):
         self.options_categories = categories
 
