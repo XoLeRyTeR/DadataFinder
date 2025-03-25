@@ -273,38 +273,52 @@ class Parser:
         # Возвращаемся на исходную вкладку
         self.driver.switch_to.window(original_tab)
         return text_details
-    def collect_lots(self):
-        info= []
-        divs_lots=self.wait.until(
+    def collect_lots_page(self):
+        info=[]
+        divs_lots = self.wait.until(
             EC.presence_of_all_elements_located((By.XPATH, f"//*[@id='ctl00_cphBody_rpvLots']/div"))
         )
         for lot in divs_lots:
-            info_lot=[]
-            name_lots=lot.find_element(By.TAG_NAME,"div").text
-            table_tr=lot.find_element(By.TAG_NAME,"table").find_elements(By.TAG_NAME,"tr")
+            info_lot = []
+            name_lots = lot.find_element(By.TAG_NAME, "div").text
+            table_tr = lot.find_element(By.TAG_NAME, "table").find_elements(By.TAG_NAME, "tr")
             for tr in table_tr:
-                tds=tr.find_elements(By.TAG_NAME,"td")
-                if len(tds)==2:
+                tds = tr.find_elements(By.TAG_NAME, "td")
+                if len(tds) == 2:
                     info_lot.append({
-                        "key":tds[0].text,
-                        "value":tds[1].text
+                        "key": tds[0].text,
+                        "value": tds[1].text
                     })
 
                 else:
-                    div_value=tds[0].find_element(By.TAG_NAME,"div")
+                    div_value = tds[0].find_element(By.TAG_NAME, "div")
                     try:
-                        detail=div_value.find_element(By.TAG_NAME,"a")
-                        detail_info=self.get_detail_info_lots(detail)
+                        detail = div_value.find_element(By.TAG_NAME, "a")
+                        detail_info = self.get_detail_info_lots(detail)
                     except NoSuchElementException:
-                        detail_info=div_value.text
+                        detail_info = div_value.text
                     info_lot.append({
-                        "key":tds[0].find_element(By.TAG_NAME,"b").text,
-                        "value":detail_info.strip()
+                        "key": tds[0].find_element(By.TAG_NAME, "b").text,
+                        "value": detail_info.strip()
                     })
             info.append({
-                "key":name_lots,
-                "value":info_lot
+                "key": name_lots,
+                "value": info_lot
             })
+        return info
+    def collect_lots(self):
+        info= []
+        count_page=1
+        while True:
+            try:
+                table_page_tr = self.driver.find_element(By.XPATH,f"//*[@id='ctl00_cphBody_ucLotsPager']/tbody/tr/td[{count_page}]")
+                table_page_tr.click()
+                info.extend(self.collect_lots_page())
+                count_page+=1
+            except NoSuchElementException as e:
+                info.extend(self.collect_lots_page())
+                break
+
         return info
     def get_info_table_from_TradeMessageInfo(self,table):
 
