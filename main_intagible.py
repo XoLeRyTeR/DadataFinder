@@ -22,7 +22,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException, TimeoutException, \
-    NoSuchWindowException, UnexpectedAlertPresentException
+    NoSuchWindowException, UnexpectedAlertPresentException, WebDriverException
 import time
 import pandas as pd
 import os
@@ -496,7 +496,9 @@ class Parser:
                     "value": self.get_text_document_pdf(file) if file.endswith(".pdf") else self.get_text_document_docx(file)
                 })
             except PackageNotFoundError as e:
-                print(e)
+                pass
+            except Exception as e:
+                pass
         self.__clear_temp_dir("data/temp/")
         return result
 
@@ -702,6 +704,9 @@ class Parser:
                     print(time.time()-time_link)
                     time_link=time.time()
                 except NoSuchWindowException:
+                    self.__init__(NAME_BROWSER)
+
+                except WebDriverException:
                     self.__init__(NAME_BROWSER)
                 except Exception :
                     self.__init__(NAME_BROWSER)# Пересоздаём драйвер
