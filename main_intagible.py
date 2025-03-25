@@ -394,6 +394,8 @@ class Parser:
         for row in rows:
             try:
                 # Извлекаем ячейки в строке
+                if row.get_attribute("class").strip()=="pager":
+                    break
                 cells = row.find_elements(By.TAG_NAME, 'td')
                 detail = cells[2].find_element(By.TAG_NAME, "a")
                 detail_info = self.get_info_TradeMessageInfo(detail)
